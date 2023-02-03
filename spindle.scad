@@ -66,5 +66,3 @@ module spindle() {
     translate([ spindle_bracket_x, -spindle_bracket_y, 0]) bracket_right();
   }
 }
-
-spindle();
