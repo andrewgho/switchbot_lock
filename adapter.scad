@@ -17,7 +17,7 @@ adapter_inner_width = thumbturn_wing_width + (2 * adapter_slop);
 adapter_peg_base_radius = (thumbturn_shaft_diameter / 2) - 2;
 adapter_peg_base_height = adapter_base_thickness / 2;
 adapter_peg_shaft_diameter = spindle_post_diameter - e2;
-adapter_peg_ball_diameter = spindle_post_diameter + 0.25;
+adapter_peg_ball_diameter = spindle_post_diameter + 0.5;  // TODO: measure
 adapter_peg_shaft_length = 6;  // TODO: measure
 
 e = 0.1;
@@ -89,6 +89,6 @@ module adapter_peg() {
   cylinder(r = adapter_peg_base_radius - e, h = adapter_peg_base_height);
   cylinder(d = adapter_peg_ball_diameter - e2, h = adapter_base_thickness);
   translate([0, 0, adapter_base_thickness]) {
-    cylinder(r = peg_shaft_diameter, h = adapter_peg_shaft_length);
+    cylinder(d = adapter_peg_shaft_diameter, h = adapter_peg_shaft_length);
   }
 }
