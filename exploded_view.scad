@@ -14,12 +14,16 @@ rotate([0, 90, 0]) {
   #thumbturn();
 
   translate([0, 0, thumbturn_shaft_height + gap]) {
-    adapter();
+    adapter_peg();
 
-    translate([0, 0, adapter_height + gap]) {
-      // Shaft is modeled with SwitchBot surface side up, so flip vertically
-      translate([0, 0, spindle_height + spindle_post_height]) {
-        mirror([0, 0, 1]) #spindle();
+    translate([0, 0, adapter_base_thickness + adapter_peg_shaft_length + gap]) {
+      adapter();
+
+      translate([0, 0, adapter_height + gap]) {
+        // Shaft is modeled with SwitchBot surface side up, so flip vertically
+        translate([0, 0, spindle_height + spindle_post_height]) {
+          mirror([0, 0, 1]) #spindle();
+        }
       }
     }
   }
