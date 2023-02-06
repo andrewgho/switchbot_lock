@@ -6,8 +6,8 @@
 include <thumbturn.scad>
 include <spindle.scad>
 
-adapter_post_hole_height = spindle_post_diameter * (3 / 2);
-adapter_base_thickness = 2 + adapter_post_hole_height;
+adapter_post_hole_height = (spindle_post_diameter * (3 / 2)) + 0.5;
+adapter_base_thickness = adapter_post_hole_height;
 adapter_height = thumbturn_height + adapter_base_thickness;
 
 adapter_slop = 0.2;
@@ -16,9 +16,9 @@ adapter_inner_width = thumbturn_wing_width + (2 * adapter_slop);
 
 adapter_peg_base_radius = (thumbturn_shaft_diameter / 2) - 2;
 adapter_peg_base_height = adapter_base_thickness / 2;
-adapter_peg_shaft_diameter = spindle_hole_diameter - e2;
-adapter_peg_ball_diameter = spindle_hole_diameter + 2;  // TODO: measure
-adapter_peg_shaft_length = 4;  // TODO: measure
+adapter_peg_shaft_diameter = spindle_hole_diameter - 0.1;
+adapter_peg_ball_diameter = spindle_hole_diameter + 1.5;  // TODO: measure
+adapter_peg_shaft_length = 3.75;  // TODO: measure
 
 e = 0.1;
 e2 = e * 2;
@@ -28,13 +28,15 @@ module adapter() {
     // Conical hat so hole can print without supports
     cylinder(d1 = 0, d2 = spindle_post_diameter, h = spindle_post_diameter / 2);
     translate([0, 0, spindle_post_diameter / 2]) {
-      cylinder(d = spindle_post_diameter, h = spindle_post_height + e);
+      cylinder(d = spindle_post_diameter, h = spindle_post_height + 0.5 + e);
     }
   }
 
-  bracket_hole_height = spindle_bracket_height + (spindle_bracket_width / 2);
-  module bracket_hole_right() {
-    translate([0, -spindle_bracket_depth / 2, 0]) {
+  spindle_bracket_width = spindle_bracket_width + 0.25;
+  spindle_bracket_depth = spindle_bracket_depth + 0.25;
+  bracket_hole_height = spindle_bracket_height + (spindle_bracket_width / 2) + 0.5;
+  module bracket_hole() {
+    translate([-spindle_bracket_width / 2, -spindle_bracket_depth / 2, 0]) {
       hull() {
         // Ridgeline that forms a 45° roof so hole can print without supports
         translate([(spindle_bracket_width - 0.1) / 2, 0, 0]) {
@@ -42,13 +44,10 @@ module adapter() {
         }
         translate([0, 0, spindle_bracket_width / 2]) {
           cube([spindle_bracket_width, spindle_bracket_depth,
-                spindle_bracket_height + e]);
+                spindle_bracket_height + 0.5 + e]);
         }
       }
     }
-  }
-  module bracket_hole_left() {
-    mirror([1, 0, 0]) bracket_hole_right();
   }
 
   difference() {
@@ -82,10 +81,10 @@ module adapter() {
 
       // Cut out holes for brackets
       translate([0, 0, adapter_height - bracket_hole_height]) {
-        translate([-spindle_bracket_x, -spindle_bracket_y]) bracket_hole_left();
-        translate([-spindle_bracket_x,  spindle_bracket_y]) bracket_hole_left();
-        translate([ spindle_bracket_x,  spindle_bracket_y]) bracket_hole_right();
-        translate([ spindle_bracket_x, -spindle_bracket_y]) bracket_hole_right();
+        translate([-spindle_bracket_x, -spindle_bracket_y]) bracket_hole();
+        translate([-spindle_bracket_x,  spindle_bracket_y]) bracket_hole();
+        translate([ spindle_bracket_x,  spindle_bracket_y]) bracket_hole();
+        translate([ spindle_bracket_x, -spindle_bracket_y]) bracket_hole();
       }
 
       // Cut out hole for separate peg assembly
