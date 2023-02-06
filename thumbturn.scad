@@ -15,7 +15,9 @@ thumbturn_wing_width     =  6.0;   // Thickness of individual thumb wings
 thumbturn_height         = 17.25;  // Outer plane of thumbturn to back of wing
 
 // TODO: measure set screw location more precisely
-thumbturn_set_screw_diameter = 6.5;  // Protrusion coming out of shaft side
+thumbturn_set_screw_diameter   =  6.5;  // Protrusion coming out of shaft side
+thumbturn_set_screw_depth      = 12;    // Approximately how far down shaft
+thumbturn_set_screw_protrusion =  1;    // Very approximate protrusion height
 
 module thumbturn() {
   // Shaft (TODO: round edges)

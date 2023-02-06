@@ -5,11 +5,15 @@
 spindle_diameter      = 36.7;   // OD of outermost (closest to lock) plate
 spindle_height        =  4.0;   // Height/thickness of outermost plate
 spindle_hole_diameter =  5.0;   // ID of center hole where thumbturn snaps into
-spindle_post_diameter =  3.5;   // OD of post protrusions stabilizing thumbturn
+spindle_post_diameter =  4.5;   // OD of post protrusions stabilizing thumbturn
 spindle_post_height   =  5;     // Very approximate post height
 
 spindle_post_inner_width = 22.3;  // 22.1 according to outer width
 spindle_post_outer_width = 29.1;  // 29.3 according to inner width
+
+spindle_post_y_offset =
+  (spindle_post_inner_width +
+   ((spindle_post_outer_width - spindle_post_inner_width) / 2)) / 2;
 
 spindle_bracket_width       =  1.9;   // Ranges from 1.8–2.0
 spindle_bracket_outer_width = 21.65;  // 21.55 according to inner width
@@ -58,8 +62,8 @@ module spindle() {
     }
   }
   translate([0, 0, spindle_height]) {
-    translate([ spindle_post_inner_width / 2, 0, 0]) post();
-    translate([-spindle_post_inner_width / 2, 0, 0]) post();
+    translate([ spindle_post_y_offset, 0, 0]) post();
+    translate([-spindle_post_y_offset, 0, 0]) post();
     translate([-spindle_bracket_x, -spindle_bracket_y, 0]) bracket_left();
     translate([-spindle_bracket_x,  spindle_bracket_y, 0]) bracket_left();
     translate([ spindle_bracket_x,  spindle_bracket_y, 0]) bracket_right();
