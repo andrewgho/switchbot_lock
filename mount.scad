@@ -4,6 +4,7 @@ include <thumbturn.scad>
 // Measurements of SwitchBot Lock unit and parts
 switchbot_top_width      =  58.3;  // width at top (bottom measures 58.0)
 switchbot_top_depth      =  59.0;  // depth from front surface to rear top
+switchbot_top_radius     =   5;    // top edge corner radius (TODO: measure)
 switchbot_padded_depth   =  61.6;  // depth including adhesive pad and plate
 switchbot_top_height     =  54.0;  // height of the top overhang only
 switchbot_total_height   = 111.8;  // total height including bottom portion
@@ -28,12 +29,37 @@ switchbot_center_x = switchbot_top_width / 2;
 spindle_center_z =
   (switchbot_total_height - switchbot_plate_bottom_y) + (spindle_diameter / 2);
 
-module switchbot() {
+// Profile of top portion of Switchbot Lock, bottom of top portion at z = 0
+module switchbot_top(depth) {
   translate([-switchbot_top_width / 2, 0, 0]) {
-    translate([0, 0, switchbot_total_height - switchbot_top_height]) {
-      cube([switchbot_top_width, switchbot_top_depth, switchbot_top_height]);
+    // Main top cube, with corners cut out for rounded top side edges
+    cube([switchbot_top_width, depth,
+          switchbot_top_height - switchbot_top_radius]);
+    translate([switchbot_top_radius, 0, 0]) {
+      cube([switchbot_top_width - (2 * switchbot_top_radius), depth,
+            switchbot_top_height]);
     }
-    cube([switchbot_top_width, switchbot_bottom_depth, switchbot_total_height]);
+    // Left top side edge rounding
+    translate([switchbot_top_radius, 0,
+               switchbot_top_height - switchbot_top_radius]) {
+      rotate(90, [-1, 0, 0]) cylinder(r = switchbot_top_radius, h = depth);
+    }
+    translate([switchbot_top_width - switchbot_top_radius, 0,
+               switchbot_top_height - switchbot_top_radius]) {
+      rotate(90, [-1, 0, 0]) cylinder(r = switchbot_top_radius, h = depth);
+    }
+  }
+}
+
+// The whole SwitchBot Lock unit, including lower cylinder, bottom at z = 0
+module switchbot() {
+  switchbot_bottom_height = switchbot_total_height - switchbot_top_height;
+  translate([0, 0, switchbot_bottom_height]) {
+    switchbot_top(switchbot_padded_depth);
+  }
+  translate([-switchbot_top_width / 2, 0, 0]) {
+    cube([switchbot_top_width, switchbot_bottom_depth,
+          switchbot_bottom_height]);
     translate([switchbot_center_x,
                switchbot_plate_depth - spindle_height,
                spindle_center_z]) {
@@ -95,9 +121,43 @@ module backplate() {
   }
 }
 
-translate([0, -(switchbot_padded_depth + switchbot_front_to_backplate_depth),
-           switchbot_top_to_backplate_top - switchbot_total_height])
+mount_width = switchbot_top_width;
+mount_depth = switchbot_front_to_door_depth;
+mount_height = switchbot_top_height;
+
+module mount() {
+  e = 0.1;
+  translate([0, -mount_depth, 0]) {
+    difference() {
+      switchbot_top(mount_depth);
+      translate([0, mount_depth - backplate_depth, 0]) {
+        translate([0, 0, switchbot_top_height -
+                   (switchbot_top_to_backplate_top + (backplate_width / 2))]) {
+          rotate(90, [-1, 0, 0]) {
+            cylinder(d = backplate_width, h = backplate_depth + e);
+          }
+        }
+        translate([-backplate_width / 2, 0, -e]) {
+          cube([backplate_width, backplate_depth + e,
+                switchbot_top_height - switchbot_top_to_backplate_top -
+                (backplate_width / 2)]);
+        }
+      }
+    }
+  }
+}
+
+// Translate y = 0 is front face of door, z = 0 is bottom of Switchbot Lock top
+gap = 20;
+translate([0,
+           -(gap + switchbot_padded_depth + mount_depth),
+           switchbot_top_height - switchbot_total_height]) {
   #switchbot();
+}
+translate([0, gap,
+           switchbot_top_height - switchbot_top_to_backplate_top -
+           backplate_total_height]) {
+  #backplate();
+}
 
-translate([0, 0, -backplate_total_height]) backplate();
-
+mount();
